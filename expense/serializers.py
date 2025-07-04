@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
+from .models import ExpenseIncome
+
 
 class UserSerializer(serializers.ModelSerializer):
     password  = serializers.CharField(write_only=True)
@@ -20,3 +22,13 @@ class UserSerializer(serializers.ModelSerializer):
 
             )
         return user
+
+class ExpenseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ExpenseIncome
+        fields = '__all__'
+        read_only_fields = ['user','created_at','updated_at']
+
+
+    def get_total(self,obj):
+        return obj.total_amount

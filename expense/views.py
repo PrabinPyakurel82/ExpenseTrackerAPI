@@ -2,11 +2,17 @@ from django.shortcuts import render
 
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework import viewsets
+from rest_framework import permissions
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 
-from .serializers import UserSerializer
 
-# Create your views here.
+from .models import ExpenseIncome
+from .serializers import UserSerializer, ExpenseSerializer
+from .permissions import IsOwnerOrSuperuser
+from .pagination import MyPagination
+
+
 class RegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
@@ -24,3 +30,22 @@ class LoginView(TokenObtainPairView):
 
 class RefreshTokenView(TokenRefreshView):
     pass
+
+
+class ExpenseIncomeViewset(viewsets.ModelViewSet):
+    serializer_class = ExpenseSerializer
+    permission_classes = [permissions.IsAuthenticated,IsOwnerOrSuperuser]
+    pagination_class = MyPagination
+
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return ExpenseIncome.objects.all()
+        return ExpenseIncome.objects.filter(user=user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+
+        
