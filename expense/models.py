@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from decimal import Decimal
 
-# Create your models here.
+
 class ExpenseIncome(models.Model):
 
 
