@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework.exceptions import PermissionDenied
 from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 
 
@@ -43,6 +44,13 @@ class ExpenseIncomeViewset(viewsets.ModelViewSet):
             return ExpenseIncome.objects.all()
         return ExpenseIncome.objects.filter(user=user)
     
+
+    def get_object(self):
+        obj = get_object_or_404(ExpenseIncome, pk=self.kwargs['pk'])
+        if self.request.user != obj.user and not self.request.user.is_superuser:
+            raise PermissionDenied("You do not have permission to access this record.")
+        return obj
+    
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
@@ -50,5 +58,5 @@ class ExpenseIncomeViewset(viewsets.ModelViewSet):
         if self.action == 'list':
             return ExpenseIncomeListSerializer
         return ExpenseIncomeDetailSerializer
-
+    
         
