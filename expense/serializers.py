@@ -23,12 +23,30 @@ class UserSerializer(serializers.ModelSerializer):
             )
         return user
 
-class ExpenseSerializer(serializers.ModelSerializer):
+
+class ExpenseIncomeListSerializer(serializers.ModelSerializer):
+    total = serializers.SerializerMethodField()
+
     class Meta:
         model = ExpenseIncome
-        fields = '__all__'
-        read_only_fields = ['user','created_at','updated_at']
+        fields = [
+            'id', 'title', 'amount', 'transaction_type',
+            'total', 'created_at'
+        ]
 
+    def get_total(self, obj):
+        return obj.total_amount
+    
 
-    def get_total(self,obj):
+class ExpenseIncomeDetailSerializer(serializers.ModelSerializer):
+    total = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ExpenseIncome
+        fields = [
+            'id', 'title', 'description', 'amount', 'transaction_type',
+            'tax', 'tax_type', 'total', 'created_at', 'updated_at'
+        ]
+
+    def get_total(self, obj):
         return obj.total_amount

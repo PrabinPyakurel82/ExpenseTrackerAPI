@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView,TokenRefreshView
 
 
 from .models import ExpenseIncome
-from .serializers import UserSerializer, ExpenseSerializer
+from .serializers import UserSerializer, ExpenseIncomeDetailSerializer,ExpenseIncomeListSerializer
 from .permissions import IsOwnerOrSuperuser
 from .pagination import MyPagination
 
@@ -33,7 +33,6 @@ class RefreshTokenView(TokenRefreshView):
 
 
 class ExpenseIncomeViewset(viewsets.ModelViewSet):
-    serializer_class = ExpenseSerializer
     permission_classes = [permissions.IsAuthenticated,IsOwnerOrSuperuser]
     pagination_class = MyPagination
 
@@ -47,5 +46,9 @@ class ExpenseIncomeViewset(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
     
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return ExpenseIncomeListSerializer
+        return ExpenseIncomeDetailSerializer
 
         
